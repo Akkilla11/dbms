@@ -1,0 +1,122 @@
+Inbuilt functions in SQL:
+•	NVL functions
+•	Case function
+•	String functions
+•	Date functions
+•	Aggregation functions
+•	Numeric function
+•	Case manipulation function
+•	Character manipulation function
+
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+INSERT INTO users  VALUES ('U01', ’md01', ‘Mihir’, ‘Dhar’, ‘mdj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ak01', ‘Aditya’, ‘Kumar’, ‘ak@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’vj01', ‘Vishal’, ‘Jha’, ‘vj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ks01', ‘Kunal’, ‘Srivastava’, ‘ks@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’kj01', ‘Kushal’, ‘Jain’, ‘kj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+-- NVL
+select nvl(100,200)from dual;
+select nvl(NULL,200)from dual;
+
+-- Case
+select firstname, case state
+when 'Uttar Pradesh' then 'UP' when 'Punjab' then 'PNB' else 'Other'
+end as state_code from users;
+
+-- String
+SELECT
+    replace('JACK and JILL', 'J', 'B') AS replacement
+FROM
+    dual;
+
+SELECT
+    ascii('a')   AS lowercase_a,
+    ascii('B')   AS uppercase_b,
+    ascii('xyz') first_of_xyz
+FROM
+    dual;
+    
+-- Date
+SELECT
+    EXTRACT(YEAR FROM sysdate) AS current_year
+FROM
+    dual;
+    
+SELECT
+    round(DATE '2017-07-16', 'MM') AS rounded_off
+FROM
+    dual;
+    
+-- Aggregation
+select sum(listprice) net_worth from properties;
+
+-- Numeric
+SELECT floor(4.1234) FROM dual;
+SELECT log(10, 1000) AS log_1000_base10 FROM dual;
+SELECT sin(3.141592653589793238) FROM dual;
+SELECT exp(1) FROM dual;
+
+-- Case manipulation
+SELECT * FROM users WHERE lower(firstname) = 'bhavesh';
+SELECT * FROM users WHERE upper(firstname) = 'AASTHA';
+
+-- Character manipulation
+SELECT instr('this is anupriya', 'anu') location FROM dual;
+SELECT concat(concat('Anu','priya'),' Johri') as sysdba_name FROM dual;

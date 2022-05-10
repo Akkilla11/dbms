@@ -1,0 +1,136 @@
+PL/ SQL functions: At least four programs
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+CREATE OR REPLACE FUNCTION totalusers RETURN NUMBER IS
+    total NUMBER(2) := 0;
+BEGIN
+    SELECT
+        COUNT(*)
+    INTO total
+    FROM
+        users;
+
+    RETURN total;
+END;
+/
+
+DECLARE
+    c NUMBER(2);
+BEGIN
+    c := totalusers();
+    dbms_output.put_line('Total no. of Customers: ' || c);
+END;
+/
+
+DECLARE
+    a NUMBER;
+    b NUMBER;
+    c NUMBER;
+
+    FUNCTION findmax (
+        x IN NUMBER,
+        y IN NUMBER
+    ) RETURN NUMBER IS
+        z NUMBER;
+    BEGIN
+        IF x > y THEN
+            z := x;
+        ELSE
+            z := y;
+        END IF;
+
+        RETURN z;
+    END;
+
+BEGIN
+    a := 23;
+    b := 45;
+    c := findmax(a, b);
+    dbms_output.put_line(' Maximum of (23,45): ' || c);
+END;
+/
+
+DECLARE
+    num       NUMBER;
+    factorial NUMBER;
+
+    FUNCTION fact (
+        x NUMBER
+    ) RETURN NUMBER IS
+        f NUMBER;
+    BEGIN
+        IF x = 0 THEN
+            f := 1;
+        ELSE
+            f := x * fact(x - 1);
+        END IF;
+
+        RETURN f;
+    END;
+
+BEGIN
+    num := 6;
+    factorial := fact(num);
+    dbms_output.put_line(' Factorial '
+                         || num
+                         || ' is '
+                         || factorial);
+END;
+/

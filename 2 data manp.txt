@@ -1,0 +1,118 @@
+SQL data manipulation: Atleast four queries for each
+•	Insert command
+•	Update command
+•	Delete command
+•	Merge command
+•	Select
+
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+INSERT INTO users  VALUES ('U01', ’md01', ‘Mihir’, ‘Dhar’, ‘mdj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ak01', ‘Aditya’, ‘Kumar’, ‘ak@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’vj01', ‘Vishal’, ‘Jha’, ‘vj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ks01', ‘Kunal’, ‘Srivastava’, ‘ks@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’kj01', ‘Kushal’, ‘Jain’, ‘kj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+CREATE TABLE user_role (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(10) CHECK ( role = 'buyer'
+                             OR role = 'seller' )
+);
+INSERT INTO user_role VALUES ('U01', 'buyer');
+INSERT INTO user_role VALUES ('U02', 'buyer');
+INSERT INTO user_role VALUES ('U02', 'seller');
+INSERT INTO user_role VALUES ('U03', 'buyer');
+INSERT INTO user_role VALUES ('U04', 'buyer');
+INSERT INTO user_role VALUES ('U05', 'seller');
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES users ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(10),
+    proptype  VARCHAR(20)
+);
+INSERT INTO properties VALUES (
+    'P01',
+    'U02',
+    'Plot No. 512, Ram Nagar',
+    'Uttar Pradesh',
+    'Meerut',
+    2500,
+    NULL,
+    1500000,
+    'plot'
+);
+INSERT INTO properties VALUES (
+    'P02',
+    'U02',
+    '510-R, Krishna Greens, Modipuram',
+    'Uttar Pradesh',
+    'Meerut',
+    1730,
+    3,
+    6500000,
+    'flat'
+);
+INSERT INTO properties VALUES (
+    'P03',
+    'U05',
+    '325/A, Lodhipuram',
+    'Punjab',
+    'Chandigarh',
+    3000,
+    NULL,
+    4500000,
+    'plot'
+);
+
+CREATE TABLE transactions (
+    txid   NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES users ( userid ),
+    buyerid
+        REFERENCES users ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txdate DATE,
+    price  NUMBER(10)
+);
+INSERT INTO transactions VALUES (10015, 'U02', 'U01', 'P02', '12 Apr 2022', 6000000);
+INSERT INTO transactions VALUES (28019, 'U02', 'U03', 'P01', '03 Mar 2022', 1500000);
+
+-- Update
+UPDATE users SET username = 'bhaveshl' WHERE userid = 'U01';
+UPDATE users SET username = 'aastham' WHERE userid = 'U03';
+UPDATE properties SET listprice = 1450000 WHERE propid = 'P01';
+UPDATE transactions SET price = 1450000 WHERE propid = 'P01';
+
+-- Select
+SELECT * FROM users;
+SELECT * FROM user_role;
+SELECT * FROM properties;
+SELECT * From transactions;
+
+-- Delete
+DELETE FROM transactions WHERE txid = 28019;
+DELETE FROM transactions WHERE txid = 10015;
+DELETE FROM properties WHERE propid = 'P01';
+DELETE FROM properties WHERE propid = 'P02';
+
+-- Merge
+MERGE INTO users U USING
+(SELECT * FROM properties) P ON (U.city=P.city)
+WHEN MATCHED THEN
+UPDATE SET U.state = P.state;

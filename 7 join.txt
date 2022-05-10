@@ -1,0 +1,84 @@
+Join queries:
+•	Equi-join
+•	Non Equi-join
+•	Outer join
+•	Left outer join
+•	Right outer join
+•	Self-join
+
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+-- Equi-join
+SELECT * FROM users, user_role WHERE users.userid = user_role.userid;
+
+-- Non Equi-join
+SELECT * FROM users, user_role WHERE users.city in ('Ghaziabad', 'Meerut');
+
+-- Outer join
+SELECT users.userid, properties.proptype FROM users, properties WHERE users.userid = properties.sellerid(+);
+
+-- Left outer join
+SELECT * FROM users LEFT OUTER JOIN user_role ON users.userid = user_role.userid AND user_role.role = 'buyer';
+
+-- Right outer join
+SELECT * FROM users RIGHT OUTER JOIN user_role ON users.userid = user_role.userid AND user_role.role = 'buyer';
+
+-- Self join
+SELECT A.firstname, B.lastname, A.City FROM users A, users B WHERE A.userid = B.userid ORDER BY A.firstname;

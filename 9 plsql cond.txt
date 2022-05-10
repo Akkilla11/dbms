@@ -1,0 +1,112 @@
+PL/ SQL conditional and iterative statements: At least four programs
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+
+
+SET SERVEROUTPUT ON;
+
+
+DECLARE
+    intcounter NUMBER := 1;
+BEGIN
+    LOOP
+        dbms_output.put_line('Counter Value=' || intcounter);
+        intcounter := intcounter + 1;
+        IF intcounter > 10 THEN
+            EXIT;
+        END IF;
+    END LOOP;
+END;
+/
+
+DECLARE
+    intcounter NUMBER := 1;
+BEGIN
+    WHILE intcounter <= 10 LOOP
+        dbms_output.put_line('Counter Value=' || intcounter);
+        intcounter := intcounter + 1;
+    END LOOP;
+END;
+/
+
+DECLARE
+    x INT := 10;
+    y INT := 80;
+BEGIN
+    IF ( y > x ) THEN
+        dbms_output.put_line('Result: '
+                             || y
+                             || ' is greater than '
+                             || x);
+    END IF;
+END;
+/
+
+DECLARE
+    x INT;
+BEGIN
+    x := &x;
+    IF MOD(x, 2) = 0 THEN
+        dbms_output.put_line('Even Number');
+    ELSE
+        dbms_output.put_line('Odd Number');
+    END IF;
+END;
+/

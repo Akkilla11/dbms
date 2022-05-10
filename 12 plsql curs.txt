@@ -1,0 +1,116 @@
+PL/ SQL cursors: implicit and explicit
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+-- Implicit
+DECLARE
+    total_rows NUMBER(2);
+BEGIN
+    UPDATE emp1
+    SET
+        salary = salary + 5000;
+
+    IF SQL%notfound THEN
+        dbms_output.put_line('no employees updated');
+    ELSIF SQL%found THEN
+        total_rows := SQL%rowcount;
+        dbms_output.put_line(total_rows || ' employees updated');
+    END IF;
+
+END;
+/
+
+SELECT
+    salary
+FROM
+    emp1;
+    
+-- Explicit
+DECLARE
+    e_id   emp1.id%TYPE;
+    e_name emp1.name%TYPE;
+    e_dept emp1.dept%TYPE;
+    CURSOR e_emp1 IS
+    SELECT
+        id,
+        name,
+        dept
+    FROM
+        emp1;
+
+BEGIN
+    OPEN e_emp1;
+    LOOP
+        FETCH e_emp1 INTO
+            e_id,
+            e_name,
+            e_dept;
+        EXIT WHEN e_emp1%notfound;
+        dbms_output.put_line(e_id
+                             || ' '
+                             || e_name
+                             || ' '
+                             || e_dept);
+
+    END LOOP;
+
+    CLOSE e_emp1;
+END;
+/
+

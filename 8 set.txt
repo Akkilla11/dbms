@@ -1,0 +1,101 @@
+Set operators and views:
+•	Union
+•	Union all
+•	Intersect
+•	Minus
+•	Creation of views
+•	Modifications of views
+•	Deletion of view
+•	Rownum query
+
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+-- Union
+SELECT * FROM tableA
+UNION
+SELECT * FROM tableB;
+
+-- Union All
+SELECT * FROM tableA
+UNION ALL
+SELECT * FROM tableB;
+
+-- Intersect
+SELECT * FROM tableA
+INTERSECT
+SELECT * FROM tableB;
+
+-- Minus
+SELECT * FROM tableA
+MINUS
+SELECT * FROM tableB;
+
+-- Create views
+CREATE VIEW user_names AS SELECT firstname, lastname FROM users;
+SELECT * FROM user_names;
+
+-- Modification of views
+ALTER VIEW user_names COMPILE;
+
+-- Deletion of view
+DROP VIEW user_names;
+
+-- Rownum query
+SELECT * FROM users WHERE ROWNUM < 4;

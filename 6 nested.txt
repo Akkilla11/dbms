@@ -1,0 +1,131 @@
+Nested queries:
+•	Copying rows from another table
+•	Updating two columns with a sub query
+•	Deleting rows based on another table
+•	Using a subquery in an insert statement
+•	Creating table using subquery
+
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+INSERT INTO users  VALUES ('U01', ’md01', ‘Mihir’, ‘Dhar’, ‘mdj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ak01', ‘Aditya’, ‘Kumar’, ‘ak@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’vj01', ‘Vishal’, ‘Jha’, ‘vj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’ks01', ‘Kunal’, ‘Srivastava’, ‘ks@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+INSERT INTO users VALUES ('U01', ’kj01', ‘Kushal’, ‘Jain’, ‘kj@abc.com', 6246085740, 'Uttar Pradesh', ‘Ghaziabad);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+CREATE TABLE user_contact (
+    userid VARCHAR(3) PRIMARY KEY,
+    email  VARCHAR(64),
+    phone  NUMBER(10),
+    city   VARCHAR(64),
+    state  VARCHAR(64)
+);
+
+-- Copying rows from another table
+INSERT INTO user_contact (userid, email, phone, city) SELECT userid, email, phone, city FROM users;
+SELECT * FROM user_contact;
+
+-- Updating two columns with a sub query
+UPDATE user_contact
+SET
+    state = 'TBD'
+WHERE
+    city IN (
+        SELECT
+            city
+        FROM
+            users
+    );
+SELECT * FROM user_contact;
+    
+-- Deleting rows based on another table
+DELETE FROM user_contact
+WHERE
+    userid IN (
+        SELECT
+            userid
+        FROM
+            users
+        WHERE
+            city = 'Chandigarh'
+    );
+SELECT * FROM user_contact;
+
+-- Using a subquery in an insert statement
+INSERT INTO user_contact ( userid )
+    ( SELECT
+        userid
+    FROM
+        users
+    WHERE
+        userid = 'U05'
+    );
+SELECT * FROM user_contact;
+
+-- Creating table using subquery
+CREATE TABLE city_state
+    AS
+        SELECT
+            city,
+            state
+        FROM
+            users
+        WHERE
+            state = 'Uttar Pradesh';
+SELECT * FROM city_state;

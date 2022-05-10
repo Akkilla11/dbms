@@ -1,0 +1,101 @@
+SQL data definition: create, alter, modify, drop, rename
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+-- Alter
+ALTER TABLE users DROP COLUMN email;
+describe users;
+
+ALTER TABLE sellers DROP COLUMN city;
+describe sellers;
+
+ALTER TABLE buyers DROP COLUMN city;
+describe buyers;
+
+ALTER TABLE properties ADD description VARCHAR(255);
+describe properties;
+
+-- Modify
+ALTER TABLE users MODIFY
+    username NOT NULL;
+describe users;
+
+ALTER TABLE properties MODIFY
+    state NOT NULL;
+describe properties;
+
+ALTER TABLE properties MODIFY
+    city NOT NULL;
+describe properties;
+
+ALTER TABLE properties MODIFY
+    address NOT NULL;
+describe properties;
+
+-- Drop
+DROP TABLE transactions;
+DROP TABLE properties;
+DROP TABLE sellers;
+DROP TABLE buyers;
+DROP TABLE users;
+
+-- Rename
+RENAME users TO user_info;
+RENAME buyers TO buyer_info;
+RENAME sellers TO seller_info;
+RENAME properties TO property_info;

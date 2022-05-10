@@ -1,0 +1,95 @@
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+CREATE OR REPLACE TRIGGER checklistprice BEFORE
+    INSERT OR UPDATE ON properties
+    FOR EACH ROW
+BEGIN
+    IF :new.listprice > 10000000 THEN
+        dbms_output.put_line('List Price should not be greater than 1 crore');
+    ELSE
+        dbms_output.put_line('Property List Price is ok');
+    END
+if;
+
+end;
+/
+
+INSERT INTO properties VALUES (
+    'P04',
+    'U02',
+    '403-C, Shipra Riviera, Indirapuram',
+    'Uttar Pradesh',
+    'Ghaziabad',
+    3000,
+    3,
+    4500000,
+    'flat'
+);
+
+INSERT INTO properties VALUES (
+    'P05',
+    'U02',
+    '403-C, Shipra Riviera, Indirapuram',
+    'Uttar Pradesh',
+    'Ghaziabad',
+    3000,
+    3,
+    20000000,
+    'flat'
+);

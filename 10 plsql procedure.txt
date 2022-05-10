@@ -1,0 +1,111 @@
+PL/ SQL procedures: At least four programs
+
+CREATE TABLE users (
+    userid    VARCHAR(3) PRIMARY KEY,
+    username  VARCHAR(64),
+    firstname VARCHAR(64),
+    lastname  VARCHAR(64),
+    email     VARCHAR(64),
+    phone     NUMBER(10)
+);
+
+CREATE TABLE sellers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state    VARCHAR(64),
+    city     VARCHAR(64),
+    numprops NUMBER(3)
+);
+
+CREATE TABLE buyers (
+    userid
+        REFERENCES users ( userid )
+    PRIMARY KEY,
+    state VARCHAR(64),
+    city  VARCHAR(64)
+);
+
+CREATE TABLE usertype (
+    userid
+        REFERENCES users ( userid ),
+    role VARCHAR(8)
+);
+
+CREATE TABLE properties (
+    propid    VARCHAR(3) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    address   VARCHAR(128),
+    state     VARCHAR(64),
+    city      VARCHAR(64),
+    area      NUMBER(6),
+    bhk       NUMBER(2),
+    listprice NUMBER(8),
+    proptype  VARCHAR(20)
+);
+
+CREATE TABLE transactions (
+    txid        NUMBER(5) PRIMARY KEY,
+    sellerid
+        REFERENCES sellers ( userid ),
+    buyerid
+        REFERENCES buyers ( userid ),
+    propid
+        REFERENCES properties ( propid ),
+    txtimestamp TIMESTAMP,
+    price       NUMBER(8)
+);
+
+
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE greetings AS
+BEGIN
+    dbms_output.put_line('Hello World!');
+END;
+/
+execute greetings;
+
+CREATE OR REPLACE PROCEDURE even_odd (
+    a IN NUMBER
+) IS
+BEGIN
+    IF MOD(a, 2) = 0 THEN
+        dbms_output.put_line(a || ' is even');
+    ELSE
+        dbms_output.put_line(a || ' is odd');
+    END IF;
+END;
+/
+execute even_odd(2);
+execute even_odd(53);
+
+DECLARE
+   i number; 
+   j number; 
+   k number;
+   PROCEDURE findAdd(num1 IN number, num2 IN number, sum OUT number) IS
+BEGIN
+   sum := num1 + num2;
+END; 
+BEGIN
+    i:= 5; 
+    j:= 5; 
+    findAdd(i, j, k); 
+    dbms_output.put_line(' The sum is : ' || k); 
+END; 
+/
+
+CREATE OR REPLACE PROCEDURE compound_intr (
+    p IN NUMBER,
+    r IN NUMBER,
+    y IN NUMBER
+) AS
+    i NUMBER(6, 2);
+BEGIN
+    i := p * power(1 + r / 100, y) - p;
+    dbms_output.put_line(i);
+END;
+/
